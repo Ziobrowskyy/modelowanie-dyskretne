@@ -1,0 +1,15 @@
+{
+  "name": "modelowanie-dyskretne",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "typescript": "^4.4.3"
+  }
+}
