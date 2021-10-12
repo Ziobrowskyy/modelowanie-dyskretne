@@ -1,4 +1,4 @@
-import { map } from "./map";
+import { map } from "./map.js";
 const height = map.length;
 const width = map[0].length;
 document.addEventListener("DOMContentLoaded", () => {
