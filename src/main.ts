@@ -1,70 +1,72 @@
 import {map} from "./map.js"
+import ColorTransform from "./colorTransform.js";
+import Canvas from "./canvas.js";
 
 const height = map.length
 const width = map[0].length
 
-type ColorArray = [r: number, g: number, b: number, a: number]
-
 document.addEventListener("DOMContentLoaded", () => {
 
-    const canvas = document.querySelector("#canvas") as HTMLCanvasElement
+    const brightnessCanvas = new Canvas(width, height, ((x, y) => {
+        const v = map[y][x]
+        return [v, v, v, 255]
+    }))
 
-    canvas.style.height = 2 * height + "px"
-    canvas.style.width = width + "px"
-    canvas.height = 2 * height
-    canvas.width = width
-
-    const ctx = canvas.getContext("2d")!
-
-    const originalBitmap = createBitmap(ctx, (index) => {
-        const i = Math.floor(index / 4)
-        const x = i % width
-        const y = Math.floor(i / width)
-        const value = map[y][x]
-        return [value, value, value, 255]
-    })
-
-    ctx.putImageData(originalBitmap, 0, 0)
-
-    const setTransformedBitmap = (brightness: number = 0) => {
-        const newBitmap = createBitmap(ctx, (index) => {
-            const valuesMapped = originalBitmap.data.slice(index, index + 3).map((it: number) => L(it, brightness))
-            return [...valuesMapped, 255] as unknown as ColorArray
-        })
-        ctx.putImageData(newBitmap, 0, height)
+    brightnessCanvas.createInput("Select brightness", -255, 255, 0)
+    brightnessCanvas.inputListener = function (value) {
+        for (let x = 0; x < this.canvasWidth; x++) {
+            for (let y = 0; y < this.canvasHeight; y++) {
+                const v = ColorTransform.changeBrightness(map[y][x], value)
+                this.setCanvasPixel(x, y, [v, v, v, 255])
+            }
+        }
+        this.updateImage()
     }
 
-    setTransformedBitmap()
+    const binarizationCanvas = new Canvas(width, height, ((x, y) => {
+        const v = ColorTransform.binarize(map[y][x], 180)
+        return [v, v, v, 255]
+    }))
 
-    const brightnessInput = document.querySelector("#brightness-input") as HTMLSpanElement
-    const brightnessSpan = document.querySelector("#brightness-span") as HTMLInputElement
+    binarizationCanvas.createInput("Select binarization threshold", 0, 255, 180)
+    binarizationCanvas.inputListener = function (value) {
+        for (let x = 0; x < this.canvasWidth; x++) {
+            for (let y = 0; y < this.canvasHeight; y++) {
+                const v = ColorTransform.binarize(map[y][x], value)
+                this.setCanvasPixel(x, y, [v, v, v, 255])
+            }
+        }
+        this.updateImage()
+    }
 
-    brightnessInput.addEventListener("change", (e) => {
-        const value = (e.target as HTMLInputElement).value
-        brightnessSpan.innerText = value
-        setTransformedBitmap(Number(value))
-    })
+
+    const histogramCanvas = document.createElement("canvas")
+    histogramCanvas.height = 100
+    histogramCanvas.width = 255
+    histogramCanvas.style.height = 100 + "px"
+    histogramCanvas.style.width = 255 + "px"
+
+    generateHistogram(brightnessCanvas.canvasImageData, histogramCanvas.getContext("2d")!)
+
+    document.body.append(brightnessCanvas.wrapper, binarizationCanvas.wrapper, histogramCanvas)
 
 })
 
-const L = (v: number, b: number) => {
-    const value = v + b
-    if (value < 0)
-        return 0
-    if (value > 255)
-        return 255
-    return value
-}
-
-const createBitmap = (ctx: CanvasRenderingContext2D, colorGetter: (index: number) => ColorArray) => {
-    const bitmap = ctx.createImageData(width, height)
-
-    for (let i = 0; i < bitmap.data.length; i += 4) {
-        const [r, g, b, a] = colorGetter(i)
-        bitmap.data[i] = r
-        bitmap.data[i + 1] = g
-        bitmap.data[i + 2] = b
-        bitmap.data[i + 3] = a
+const generateHistogram = (imageData: ImageData, histogramCtx: CanvasRenderingContext2D) => {
+    const colorMap = Array(255).fill(0)
+    for (let i = 0; i < imageData.data.length; i += 4) {
+        const avColor = imageData.data[i]
+        // const avColor = image.data.slice(i, i + 3).reduce((prev, curr) => prev + curr, 0) / 4
+        colorMap[Math.round(avColor)] += 1
     }
-    return bitmap
+    const h = histogramCtx.canvas.height
+    const w = histogramCtx.canvas.width
+    const maxHeight = colorMap.reduce((prev, curr) => curr > prev ? curr : prev, 0)
+    const barWidth = w / colorMap.length
+    histogramCtx.fillStyle = "gray"
+    histogramCtx.fillRect(0, 0, w, h)
+    histogramCtx.fillStyle = "blue"
+    colorMap.forEach((value, i) => {
+        histogramCtx.fillRect(i * barWidth, h, barWidth, -(value / maxHeight) * h)
+    })
 }
