@@ -2,8 +2,8 @@ import Utils from "../utils.js";
 import Tile from "./tile.js";
 
 export class Simulation {
-    height: number = 100
-    width: number = 100
+    height: number
+    width: number
     wrapper: HTMLDivElement = document.createElement("div")
     board: HTMLDivElement = document.createElement("div")
     tiles: Tile[][]
@@ -11,7 +11,9 @@ export class Simulation {
     #rule: number = 0
     rulePatterns: boolean[] = Array(7).fill(false)
 
-    constructor(rule: number = 60) {
+    constructor(rule: number = 60, grid: number = 100) {
+        this.height = grid
+        this.width = grid
         this.rule = rule
 
         this.board.classList.add("board")
