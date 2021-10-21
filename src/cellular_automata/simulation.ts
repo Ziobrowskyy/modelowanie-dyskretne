@@ -8,16 +8,11 @@ export class Simulation {
     board: HTMLDivElement = document.createElement("div")
     tiles: Tile[][]
 
-    rule: number
-    rulePatterns: boolean[]
+    #rule: number = 0
+    rulePatterns: boolean[] = Array(7).fill(false)
 
     constructor(rule: number = 60) {
         this.rule = rule
-        this.rulePatterns = rule.toString(2).padStart(7, "0").split("").map(it => Boolean(Number(it))).reverse()
-
-        console.log(this.rule)
-        console.log(this.rule.toString(2))
-        console.log(this.rulePatterns)
 
         this.board.classList.add("board")
         this.board.style.gridTemplateColumns = `repeat(${this.width}, 1fr)`
@@ -39,6 +34,15 @@ export class Simulation {
 
         this.tiles[0][this.width / 2].isActive = true
         this.runSimulation()
+    }
+
+    set rule(value: number) {
+        this.#rule = value
+        this.rulePatterns = value.toString(2).padStart(7, "0").split("").map(it => Boolean(Number(it))).reverse()
+    }
+
+    get rule() {
+        return this.#rule
     }
 
     getRuleIndex(x: number, y: number) {
