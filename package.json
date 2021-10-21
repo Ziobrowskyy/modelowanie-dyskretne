@@ -5,10 +5,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node server/out/index.js",
-    "client start": "npm run start --prefix ./client",
-    "client build": "npm run build --prefix ./client",
-    "postinstall": "tsc && npm install --only=dev --prefix ./client && npm install --prefix ./client && npm run build --prefix ./client"
+    "postinstall": "tsc",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
