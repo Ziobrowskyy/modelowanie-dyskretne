@@ -1,4 +1,4 @@
-import {ColorArray} from "./colorTransform.js";
+import {ColorArray} from "./imageTransform.js";
 
 export default class Canavs {
     wrapper: HTMLDivElement
@@ -8,6 +8,7 @@ export default class Canavs {
     input?: HTMLInputElement
     inputValueSpan?: HTMLSpanElement
     inputListener?: (value: number) => any
+    titleHeading: HTMLHeadingElement
 
     constructor(public canvasWidth: number = 100, public canvasHeight: number = 100, pixelGetter?: (x: number, y: number) => ColorArray) {
         this.canvas = document.createElement("canvas")
@@ -16,9 +17,13 @@ export default class Canavs {
         this.ctx = this.canvas.getContext("2d")!
         this.canvasImageData = this.ctx.createImageData(canvasWidth, canvasHeight)
 
+        this.titleHeading = document.createElement("h3")
+        this.titleHeading.classList.toggle("hidden")
+
         this.wrapper = document.createElement("div")
         this.wrapper.classList.add("canvas-wrapper")
-        this.wrapper.append(this.canvas)
+
+        this.wrapper.append(this.titleHeading, this.canvas)
 
         if (!pixelGetter)
             return
@@ -31,7 +36,7 @@ export default class Canavs {
         this.updateImage()
     }
 
-    public setCanvasPixel(x: number, y: number, color: ColorArray) {
+    setCanvasPixel(x: number, y: number, color: ColorArray) {
         const idx = (x + y * this.canvasWidth) * 4
         this.canvasImageData.data[idx] = color[0]
         this.canvasImageData.data[idx + 1] = color[1]
@@ -39,13 +44,18 @@ export default class Canavs {
         this.canvasImageData.data[idx + 3] = color[3]
     }
 
-    public getCanvasPixel(x: number, y: number): ColorArray {
+    getCanvasPixel(x: number, y: number): ColorArray {
         const idx = (x + y * this.canvasWidth) * 4
         return this.canvasImageData.data.slice(idx, idx + 4) as unknown as ColorArray
     }
 
-    public updateImage(imageData = this.canvasImageData, x: number = 0, y: number = 0) {
+    updateImage(imageData = this.canvasImageData, x: number = 0, y: number = 0) {
         this.ctx.putImageData(this.canvasImageData, x, y)
+    }
+
+    set title(title: string) {
+        this.titleHeading.innerText = title
+        this.titleHeading.classList.toggle("hidden")
     }
 
     createInput(label: string, min: number, max: number, def: number = 0) {
@@ -72,7 +82,7 @@ export default class Canavs {
         this.input.addEventListener("change", this.onInputChange.bind(this))
     }
 
-    public onInputChange(event: Event) {
+    private onInputChange(event: Event) {
         if (!this.input || !this.inputValueSpan)
             return
         if (event.target !== this.input)

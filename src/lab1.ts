@@ -1,11 +1,16 @@
-import {map} from "./map.js"
-import ColorTransform from "./colorTransform.js";
-import Canvas from "./canvas.js";
+import {map} from "./image_transfrom/map.js"
+import ImageTransform from "./image_transfrom/imageTransform.js";
+import Canvas from "./image_transfrom/canvas.js";
 
 const height = map.length
 const width = map[0].length
 
 document.addEventListener("DOMContentLoaded", () => {
+
+    const originalImageCanvas = new Canvas(width, height, ((x, y) => {
+        const v = map[y][x]
+        return [v, v, v, 255]
+    }))
 
     const brightnessCanvas = new Canvas(width, height, ((x, y) => {
         const v = map[y][x]
@@ -16,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     brightnessCanvas.inputListener = function (value) {
         for (let x = 0; x < this.canvasWidth; x++) {
             for (let y = 0; y < this.canvasHeight; y++) {
-                const v = ColorTransform.changeBrightness(map[y][x], value)
+                const v = ImageTransform.changeBrightness(map[y][x], value)
                 this.setCanvasPixel(x, y, [v, v, v, 255])
             }
         }
@@ -24,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const binarizationCanvas = new Canvas(width, height, ((x, y) => {
-        const v = ColorTransform.binarize(map[y][x], 180)
+        const v = ImageTransform.binarize(map[y][x], 180)
         return [v, v, v, 255]
     }))
 
@@ -32,13 +37,12 @@ document.addEventListener("DOMContentLoaded", () => {
     binarizationCanvas.inputListener = function (value) {
         for (let x = 0; x < this.canvasWidth; x++) {
             for (let y = 0; y < this.canvasHeight; y++) {
-                const v = ColorTransform.binarize(map[y][x], value)
+                const v = ImageTransform.binarize(map[y][x], value)
                 this.setCanvasPixel(x, y, [v, v, v, 255])
             }
         }
         this.updateImage()
     }
-
 
     const histogramCanvas = document.createElement("canvas")
     histogramCanvas.height = 100
@@ -49,7 +53,6 @@ document.addEventListener("DOMContentLoaded", () => {
     generateHistogram(brightnessCanvas.canvasImageData, histogramCanvas.getContext("2d")!)
 
     document.body.append(brightnessCanvas.wrapper, binarizationCanvas.wrapper, histogramCanvas)
-
 })
 
 const generateHistogram = (imageData: ImageData, histogramCtx: CanvasRenderingContext2D) => {

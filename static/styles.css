@@ -1,0 +1,17 @@
+.board {
+    display: grid;
+    height: min(80vh, 80vw);
+    width: min(80vh, 80vw);
+    border: 1px black solid;
+}
+
+.tile {
+    display: block;
+    border: 1px rgba(0,0,0, 0.4) solid;
+    user-select: none;
+    background-color: white;
+}
+
+.active {
+    background-color: red;
+}
