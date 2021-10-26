@@ -36,6 +36,20 @@ export default class Canavs {
         this.updateImage()
     }
 
+    async setCanvasImage(src: string) {
+        const img = new Image()
+        img.src = src
+        await img.decode()
+        this.ctx.drawImage(img, 0, 0)
+    }
+
+    get pixels(): number[][] {
+        return new Array(this.canvasHeight).fill(
+            (y: number) => Array(this.canvasWidth).fill(
+                (x: number) => this.getCanvasPixel(x, y)
+            ))
+    }
+
     setCanvasPixel(x: number, y: number, color: ColorArray) {
         const idx = (x + y * this.canvasWidth) * 4
         this.canvasImageData.data[idx] = color[0]
@@ -69,6 +83,8 @@ export default class Canavs {
         inputLabel.textContent = `${label}. Current value: `
 
         this.inputValueSpan = document.createElement("span")
+        this.inputValueSpan.style.width = "40px"
+        this.inputValueSpan.style.display = "inline-block"
         this.inputValueSpan.textContent = String(def)
         inputLabel.append(this.inputValueSpan)
 

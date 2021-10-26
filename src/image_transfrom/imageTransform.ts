@@ -17,60 +17,49 @@ export default class ImageTransform {
         return v <= a ? 0 : 255;
     }
 
-    static erode(values: number[][], x: number, y: number, threshold: number = 200) {
-        const dx = Utils.clampValue(x, 1, values[0].length - 2)
-        const dy = Utils.clampValue(y, 1, values.length - 2)
-        let value: number
+    static erode(binarizedValues: number[][], x: number, y: number, threshold: number = 200) {
+        const dx = Utils.clampValue(x, 1, binarizedValues[0].length - 2)
+        const dy = Utils.clampValue(y, 1, binarizedValues.length - 2)
         for (let i = -1; i <= 1; i++) {
             for (let j = -1; j <= 1; j++) {
-                if(i === 0 && j === 0) {
-                    value = this.binarize(values[dy + j][dx + i], threshold)
+                if (i === 0 && j === 0)
                     continue
-                }
-
-                const v = this.binarize(values[dy + j][dx + i], threshold)
-                if (v < threshold)
+                if (binarizedValues[dy + j][dx + i] < threshold)
                     return 0
             }
         }
-        return value!
-        // return values[y][x]
+        return binarizedValues[dy][dx]
     }
 
-    static dilatate(values: number[][], x: number, y: number, threshold: number = 127) {
-        const dx = Utils.clampValue(x, 1, values[0].length - 2)
-        const dy = Utils.clampValue(y, 1, values.length - 2)
-        let value: number
+    static dilate(binarizedValues: number[][], x: number, y: number, threshold: number = 127) {
+        const dx = Utils.clampValue(x, 1, binarizedValues[0].length - 2)
+        const dy = Utils.clampValue(y, 1, binarizedValues.length - 2)
         for (let i = -1; i <= 1; i++) {
             for (let j = -1; j <= 1; j++) {
-                if(i === 0 && j === 0) {
-                    value = this.binarize(values[dy + j][dx + i], threshold)
+                if (i === 0 && j === 0)
                     continue
-                }
-                const v = this.binarize(values[dy + j][dx + i], threshold)
-                if (v > threshold)
+                if (binarizedValues[dy + j][dx + i] > threshold)
                     return 255
             }
         }
-        return value!
-        // return values[y][x]
+        return binarizedValues[dy][dx]
     }
 
     static lowerFilter = new Filter([
-            [1, 1, 1],
-            [1, 1, 1],
-            [1, 1, 1],
-        ])
+        [1, 1, 1],
+        [1, 1, 1],
+        [1, 1, 1],
+    ])
 
     static upperFilter = new Filter([
-            [-1, -1, -1],
-            [-1, 9, -1],
-            [-1, -1, -1],
-        ])
+        [-1, -1, -1],
+        [-1, 9, -1],
+        [-1, -1, -1],
+    ])
 
     static gaussFilter = new Filter([
-            [1, 4, 1],
-            [4, 32, 4],
-            [1, 4, 1],
-        ])
-    }
+        [1, 4, 1],
+        [4, 32, 4],
+        [1, 4, 1],
+    ])
+}
