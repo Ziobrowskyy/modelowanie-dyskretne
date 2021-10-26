@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const getRule = () => Number(ruleInput.value)
     const getGrid = () => Number(gridInput.value)
 
-    window.sim = new Simulation(getRule(), getGrid())
+    window.sim = new Simulation(getRule(), 10)
     document.body.append(window.sim.wrapper)
 
     applyRuleButton.addEventListener("mousedown", () => {

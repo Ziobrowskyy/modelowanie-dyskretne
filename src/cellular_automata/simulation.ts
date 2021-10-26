@@ -34,13 +34,14 @@ export class Simulation {
             }
         }
 
-        this.tiles[0][this.width / 2].isActive = true
+        this.tiles[0][Math.floor(this.width / 2)].isActive = true
         this.runSimulation()
     }
 
     set rule(value: number) {
         this.#rule = value
         this.rulePatterns = value.toString(2).padStart(7, "0").split("").map(it => Boolean(Number(it))).reverse()
+        console.log(this.rulePatterns)
     }
 
     get rule() {
@@ -48,12 +49,12 @@ export class Simulation {
     }
 
     getRuleIndex(x: number, y: number) {
-        const tiles: Tile[] = []
-        for (let i = x; i <= x + 2; i++) {
-            tiles.push(this.tiles[y][Utils.wrapValue(i, 0, this.width)])
+        let idx = 0
+        for (let i = 0; i <= 2; i++) {
+            const tile = this.tiles[y][Utils.wrapValue(x + i, 0, this.width)]
+            idx = (idx << 1) + (tile.isActive ? 1 : 0)
         }
-        const tilesBinarized = tiles.map(tile => tile.isActive ? "1" : "0").join("")
-        return parseInt(tilesBinarized, 2)
+        return idx
     }
 
     simulationStep(step: number) {
