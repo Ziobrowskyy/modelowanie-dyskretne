@@ -1,8 +1,8 @@
-import {Simulation} from "./cellular_automata/simulation.js";
+import Simulation1d from "./cellular_automata/simulation1d.js";
 
 declare global {
     interface Window {
-        sim: Simulation
+        sim: Simulation1d
     }
 }
 
@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const getRule = () => Number(ruleInput.value)
     const getGrid = () => Number(gridInput.value)
 
-    window.sim = new Simulation(getRule(), 10)
+    window.sim = new Simulation1d(getRule(), getGrid())
     document.body.append(window.sim.wrapper)
 
     applyRuleButton.addEventListener("mousedown", () => {
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log(`New grid is: ${getGrid()}`)
 
         window.sim.wrapper.remove()
-        window.sim = new Simulation(getRule(), getGrid())
+        window.sim = new Simulation1d(getRule(), getGrid())
         document.body.append(window.sim.wrapper)
         window.sim.runSimulation()
     })

@@ -3,7 +3,7 @@
 .idea
 yarn.lock
 
-out/*
+/out/
 package-lock.json
 
 source-code.zip
