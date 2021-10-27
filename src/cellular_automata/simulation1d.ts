@@ -6,7 +6,7 @@ export default class Simulation1d extends CellularAutomata {
     rulePatterns: boolean[] = Array(8).fill(false)
 
     constructor(rule: number = 60, grid: number = 100) {
-        super(grid,grid)
+        super(grid, grid)
 
         this.rule = rule
 
@@ -41,13 +41,8 @@ export default class Simulation1d extends CellularAutomata {
     }
 
     runSimulation() {
-        setInterval(() => {
-            for (let step = 0; step < this.height - 1; step++) {
-                this.simulationStep(step)
-            }
-            this.tiles[this.height-1].forEach((tile, i) =>
-                this.tiles[0][i].isActive = tile.isActive
-            )
-        }, 200)
+        for (let step = 0; step < this.height - 1; step++) {
+            this.simulationStep(step)
+        }
     }
 }
