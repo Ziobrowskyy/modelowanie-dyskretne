@@ -4,13 +4,24 @@ import Utils from "../utils.js";
 export default class GameOfLife extends CellularAutomata {
     isRunning: boolean = false
     #simulationInterval?: number
+    #simulationStepDelay: number
 
-    constructor(width: number = 50, height: number = width) {
+    constructor(width: number = 50, height: number = width, simulationStepDelay: number = 100) {
         super(width, height)
+        this.#simulationStepDelay = simulationStepDelay
         this.tiles.forEach(row => row.forEach(tile => {
             tile.isActive = Math.random() > 0.5
         }))
     }
+
+    set simulationStepDelay(value: number) {
+        this.#simulationStepDelay = value
+        if (!this.isRunning)
+            return
+        this.stopSimulation()
+        this.runSimulation()
+    }
+
 
     runSimulation() {
         if (this.isRunning)
@@ -18,7 +29,7 @@ export default class GameOfLife extends CellularAutomata {
         this.isRunning = true
         this.#simulationInterval = setInterval(() => {
             this.simulationStep()
-        }, 100)
+        }, this.#simulationStepDelay)
     }
 
     stopSimulation() {
