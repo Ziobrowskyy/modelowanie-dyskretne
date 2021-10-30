@@ -5,6 +5,7 @@ export default class GameOfLife extends CellularAutomata {
     isRunning: boolean = false
     #simulationInterval?: number
     #simulationStepDelay: number
+    // wasRunning?: boolean
 
     constructor(width: number = 50, height: number = width, simulationStepDelay: number = 100) {
         super(width, height)
@@ -12,6 +13,20 @@ export default class GameOfLife extends CellularAutomata {
         this.tiles.forEach(row => row.forEach(tile => {
             tile.isActive = Math.random() > 0.5
         }))
+
+        let wasRunning: boolean
+        this.board.addEventListener("mousedown", () => {
+            console.log("mousedown")
+            wasRunning = this.isRunning
+            if(wasRunning) {
+                this.stopSimulation()
+            }
+        })
+        this.board.addEventListener("mouseup", () => {
+            console.log("mouseup")
+            if(wasRunning)
+                this.runSimulation()
+        })
     }
 
     set simulationStepDelay(value: number) {
@@ -21,7 +36,6 @@ export default class GameOfLife extends CellularAutomata {
         this.stopSimulation()
         this.runSimulation()
     }
-
 
     runSimulation() {
         if (this.isRunning)

@@ -57,14 +57,5 @@ document.addEventListener("DOMContentLoaded", () => {
     simulationRunButton.addEventListener("mousedown", () => {
         setSimulation(!window.game.isRunning)
     })
-    let wasRunning: boolean
-    window.game.board.addEventListener("mousedown", () => {
-        wasRunning = window.game.isRunning
-        if(wasRunning)
-            window.game.stopSimulation()
-    })
-    window.game.board.addEventListener("mouseup", () => {
-        if(wasRunning)
-            window.game.runSimulation()
-    })
+
 })
