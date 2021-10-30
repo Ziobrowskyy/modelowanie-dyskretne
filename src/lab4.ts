@@ -7,7 +7,7 @@ declare global {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const gridInput = document.body.querySelector("#grid-input") as HTMLButtonElement
+    const gridInput = document.body.querySelector("#grid-input") as HTMLInputElement
     const applyGridButton = document.body.querySelector("#apply-grid-button") as HTMLButtonElement
     const clearGridButton = document.body.querySelector("#clear-grid-button") as HTMLButtonElement
     const simulationStepDelayInput = document.body.querySelector("#simulation-step-delay-input") as HTMLInputElement
