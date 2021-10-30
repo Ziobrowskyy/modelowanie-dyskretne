@@ -16,14 +16,12 @@ export default class GameOfLife extends CellularAutomata {
 
         let wasRunning: boolean
         this.board.addEventListener("mousedown", () => {
-            console.log("mousedown")
             wasRunning = this.isRunning
             if(wasRunning) {
                 this.stopSimulation()
             }
         })
         this.board.addEventListener("mouseup", () => {
-            console.log("mouseup")
             if(wasRunning)
                 this.runSimulation()
         })
