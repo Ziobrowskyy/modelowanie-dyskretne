@@ -70,7 +70,7 @@ export default class GameOfLife extends CellularAutomata {
         oldTiles.forEach((row, y) =>
             row.forEach((wasAlive, x) => {
                 const n = this.getNeighbours(x, y, oldTiles)
-                this.tiles[y][x].isActive = n === 2 && wasAlive || n === 3
+                this.tiles[y][x].isActive = (n === 2 && wasAlive) || n === 3
             }))
     }
 }
