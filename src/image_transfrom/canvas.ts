@@ -62,7 +62,9 @@ export default class Canavs {
         const idx = (x + y * this.canvasWidth) * 4
         return this.canvasImageData.data.slice(idx, idx + 4) as unknown as ColorArray
     }
-
+    clearCanvas(color: ColorArray) {
+        this.ctx.fillRect(0,0,this.canvasWidth,this.canvasHeight)
+    }
     updateImage(imageData = this.canvasImageData, x: number = 0, y: number = 0) {
         this.ctx.putImageData(this.canvasImageData, x, y)
     }
