@@ -1,70 +1,108 @@
-import Utils from "../utils.js";
-import CellularAutomataCanvas from "./cellularAutomataCanvas.js";
+import {Color, ColorArray} from "../utils.js";
+import GameOfLife from "./gameOfLife.js";
 
-export default class GameOfLifeCanvas extends CellularAutomataCanvas {
-    isRunning: boolean = false
-    #simulationInterval?: number
-    #simulationStepDelay: number
+export default class GameOfLifeCanvas extends GameOfLife {
+    canvas: HTMLCanvasElement
+    ctx: CanvasRenderingContext2D
+    canvasImageData: ImageData
+    canvasHeight: number = 800
+    canvasWidth: number = 800
 
-    // wasRunning?: boolean
+    isMousePressed: boolean = false
+    wasRunning: boolean = false
+    buttonPressed: 0 | 2 = 0
 
-    constructor(width: number = 50, height: number = width, simulationStepDelay: number = 100) {
-        super(width, height, 800/width)
-        this.#simulationStepDelay = simulationStepDelay
-        this.tiles = this.tiles.map(row => row.map(_ => Math.random() > 0.5))
+    constructor(width: number, height: number, simulationStepDelay: number) {
+        super(width, height, simulationStepDelay)
+
+        this.canvas = document.createElement("canvas")
+        this.canvas.width = width
+        this.canvas.height = height
+        this.canvas.id = "game-of-life-canvas"
+        this.canvas.style.width = `${this.canvasWidth}px`
+        this.canvas.style.height = `${this.canvasHeight}px`
+        this.canvas.addEventListener("mousemove", this.onMouseMove.bind(this))
+        this.canvas.addEventListener("mousedown", this.onMouseDown.bind(this))
+        this.canvas.addEventListener("mouseup", this.onMouseUp.bind(this))
+        this.canvas.addEventListener("contextmenu", e => e.preventDefault())
+
+        this.board.append(this.canvas)
+
+        this.ctx = this.canvas.getContext("2d")!
+        this.canvasImageData = this.ctx.createImageData(width, height)
         this.drawTiles()
     }
 
-    set simulationStepDelay(value: number) {
-        this.#simulationStepDelay = value
-        if (!this.isRunning)
-            return
-        this.stopSimulation()
-        this.runSimulation()
+    #getGridPosition(mouseX: number, mouseY: number) {
+        return {
+            x: Math.floor(mouseX / this.canvasWidth * this.width),
+            y: Math.floor(mouseY / this.canvasHeight * this.height)
+        }
     }
 
-    runSimulation() {
-        if (this.isRunning)
+    onMouseDown(e: MouseEvent) {
+        if (e.button === 1)
             return
-        this.isRunning = true
-        this.#simulationInterval = setInterval(() => {
-            this.simulationStep()
-        }, this.#simulationStepDelay)
+        this.isMousePressed = true
+        this.wasRunning = this.isRunning
+        this.buttonPressed = e.button === 0 ? 0 : 2
+        const {x, y} = this.#getGridPosition(e.offsetX, e.offsetY)
+        this.setTile(x, y, !e.ctrlKey && e.button !== 2)
+        this.updatePixels()
+        if (this.wasRunning)
+            this.stopSimulation()
     }
 
-    stopSimulation() {
-        if (!this.isRunning)
-            return
-        this.isRunning = false
-        clearInterval(this.#simulationInterval)
+    onMouseUp(e: MouseEvent) {
+        this.isMousePressed = false
+        if (this.wasRunning)
+            this.runSimulation()
     }
 
-    getNeighbours(x: number, y: number, tiles: boolean[][]) {
-        let sum = 0
-        for (let dy = -1; dy <= 1; dy++) {
-            for (let dx = -1; dx <= 1; dx++) {
-                if (dy === 0 && dx === 0)
-                    continue
-                const wy = Utils.wrapValue(y + dy, 0, this.height)
-                const wx = Utils.wrapValue(x + dx, 0, this.width)
-                sum += Number(tiles[wy][wx])
+    onMouseMove(e: MouseEvent) {
+        if (!this.isMousePressed)
+            return
+        const {x, y} = this.#getGridPosition(e.offsetX, e.offsetY)
+        this.setTile(x, y, !e.ctrlKey && this.buttonPressed !== 2)
+        this.updatePixels()
+    }
+
+    setTile(x: number, y: number, value: boolean = true) {
+        this.tiles[y][x] = value
+        this.drawPixel(x, y, value ? Color.RED : Color.WHITE)
+    }
+
+    drawTiles() {
+        this.tiles.forEach((row, y) => row.forEach((isAlive, x) => {
+                const c = isAlive ? Color.RED : Color.WHITE
+                this.drawPixel(x, y, c)
+            }
+        ))
+        this.updatePixels()
+    }
+
+    drawPixel(x: number, y: number, color: ColorArray) {
+        this.canvasImageData.data.set(color, (y * this.width + x) * 4)
+    }
+
+    updatePixels() {
+        this.ctx.putImageData(this.canvasImageData, 0, 0)
+    }
+
+    clearGrid(): void {
+        super.clearGrid()
+        this.drawTiles()
+    }
+
+    simulationStep(): void {
+        const oldTiles = this.tiles.map(row => [...row])
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+                const n = this.getNeighbours(x, y, oldTiles)
+                this.tiles[y][x] = (n === 2 && oldTiles[y][x]) || n === 3
             }
         }
-        return sum
-    }
-
-    simulationStep() {
-        const oldTiles = this.tiles.map(row => [...row])
-        this.tiles = oldTiles.map((row, y) =>
-            row.map((wasAlive, x) => {
-                const n = this.getNeighbours(x, y, oldTiles)
-                return (n === 2 && wasAlive) || n === 3
-            }))
         this.drawTiles()
     }
 
-    clearGrid() {
-        this.tiles = Array(this.height).fill(Array(this.width).fill(false))
-        this.drawTiles()
-    }
 }

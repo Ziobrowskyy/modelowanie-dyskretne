@@ -2,7 +2,7 @@ import GameOfLifeCanvas from "./cellular_automata/gameOfLifeCanvas.js";
 
 declare global {
     interface Window {
-        gameCanvas: GameOfLifeCanvas
+        game: GameOfLifeCanvas
     }
 }
 
@@ -18,39 +18,39 @@ document.addEventListener("DOMContentLoaded", () => {
     const getSimulationStepDelay = () => Number(simulationStepDelayInput.value)
     const setSimulation = (value: boolean) => {
         if (value)
-            window.gameCanvas.runSimulation()
+            window.gameDiv.runSimulation()
         else
-            window.gameCanvas.stopSimulation()
+            window.gameDiv.stopSimulation()
         simulationRunButton.innerText = value ? "Stop simulation" : "Run simulation"
     }
     applyGridButton.addEventListener("mousedown", () => {
         console.log(`New grid is: ${getGrid()}`)
         setSimulation(false)
-        window.gameCanvas.wrapper.remove()
-        window.gameCanvas = new GameOfLifeCanvas(getGrid(), getGrid(), getSimulationStepDelay())
-        document.body.append(window.gameCanvas.wrapper)
+        window.gameDiv.wrapper.remove()
+        window.gameDiv = new GameOfLifeCanvas(getGrid(), getGrid(), getSimulationStepDelay())
+        document.body.append(window.gameDiv.wrapper)
     })
 
     clearGridButton.addEventListener("mousedown", () => {
         console.log(`Clear grid`)
         setSimulation(false)
-        window.gameCanvas.clearGrid()
+        window.gameDiv.clearGrid()
     })
 
     simulationStepDelayInput.addEventListener("input", () => {
         const newDelay = getSimulationStepDelay()
         console.log(`Simulation step delay ${newDelay}`)
-        window.gameCanvas.simulationStepDelay = newDelay
+        window.gameDiv.simulationStepDelay = newDelay
     })
     simulationStepButton.addEventListener("mousedown", () => {
         console.log(`Simulation step`)
         setSimulation(false)
-        window.gameCanvas.simulationStep()
+        window.gameDiv.simulationStep()
     })
 
     simulationRunButton.addEventListener("mousedown", () => {
-        setSimulation(!window.gameCanvas.isRunning)
+        setSimulation(!window.gameDiv.isRunning)
     })
-    window.gameCanvas = new GameOfLifeCanvas(50,50, 100)
-    document.body.append(window.gameCanvas.wrapper)
+    window.gameDiv = new GameOfLifeCanvas(50, 50, 100)
+    document.body.append(window.gameDiv.wrapper)
 })

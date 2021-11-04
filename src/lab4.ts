@@ -1,8 +1,9 @@
 import GameOfLife from "./cellular_automata/gameOfLife.js";
+import GameOfLifeDiv from "./cellular_automata/gameOfLifeDiv.js";
 
 declare global {
     interface Window {
-        game: GameOfLife
+        gameDiv: GameOfLife
     }
 }
 
@@ -17,45 +18,45 @@ document.addEventListener("DOMContentLoaded", () => {
     const getGrid = () => Number(gridInput.value)
     const getSimulationStepDelay = () => Number(simulationStepDelayInput.value)
 
-    window.game = new GameOfLife(getGrid(), getGrid(), getSimulationStepDelay())
-    document.body.append(window.game.wrapper)
+    window.gameDiv = new GameOfLifeDiv(getGrid(), getGrid(), getSimulationStepDelay())
+    document.body.append(window.gameDiv.wrapper)
 
     const setSimulation = (value: boolean) => {
         if (value)
-            window.game.runSimulation()
+            window.gameDiv.runSimulation()
         else
-            window.game.stopSimulation()
+            window.gameDiv.stopSimulation()
         simulationRunButton.innerText = value ? "Stop simulation" : "Run simulation"
     }
 
     applyGridButton.addEventListener("mousedown", () => {
         console.log(`New grid is: ${getGrid()}`)
         setSimulation(false)
-        window.game.wrapper.remove()
-        window.game = new GameOfLife(getGrid(), getGrid())
-        document.body.append(window.game.wrapper)
+        window.gameDiv.wrapper.remove()
+        window.gameDiv = new GameOfLifeDiv(getGrid(), getGrid(), getSimulationStepDelay())
+        document.body.append(window.gameDiv.wrapper)
     })
 
     clearGridButton.addEventListener("mousedown", () => {
         console.log(`Clear grid`)
         setSimulation(false)
-        window.game.tiles.forEach(row => row.forEach(tile => tile.isActive = false))
+        window.gameDiv.clearGrid()
     })
 
     simulationStepDelayInput.addEventListener("input", () => {
         const newDelay = getSimulationStepDelay()
         console.log(`Simulation step delay ${newDelay}`)
-        window.game.simulationStepDelay = newDelay
+        window.gameDiv.simulationStepDelay = newDelay
     })
 
     simulationStepButton.addEventListener("mousedown", () => {
         console.log(`Simulation step`)
         setSimulation(false)
-        window.game.simulationStep()
+        window.gameDiv.simulationStep()
     })
 
     simulationRunButton.addEventListener("mousedown", () => {
-        setSimulation(!window.game.isRunning)
+        setSimulation(!window.gameDiv.isRunning)
     })
 
 })

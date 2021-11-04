@@ -1,16 +1,23 @@
 import Utils from "../utils.js";
 import CellularAutomata from "./cellularAutomata.js";
+import Tile from "./tile.js";
 
-export default class Simulation1d extends CellularAutomata {
+export default class Simulation1d extends CellularAutomata<Tile> {
     #rule: number = 0
     rulePatterns: boolean[] = Array(8).fill(false)
+    tiles: Tile[][]
 
     constructor(rule: number = 60, grid: number = 100) {
         super(grid, grid)
-
         this.rule = rule
 
-        this.tiles[0][Math.floor(this.width / 2)].isActive = true
+        this.tiles = Array(this.height)
+        for(let y = 0; y < this.height; y++) {
+            this.tiles[y] = Array(this.width)
+            for (let x = 0; x < this.width; x++)
+                this.tiles[y][x] = new Tile()
+        }
+
         this.runSimulation()
     }
 

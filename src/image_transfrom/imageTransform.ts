@@ -1,8 +1,6 @@
 import {Filter} from "./filter.js";
 import Utils from "../utils.js";
 
-export type ColorArray = [r: number, g: number, b: number, a: number]
-
 export default class ImageTransform {
     static changeBrightness(v: number, b: number) {
         const value = v + b

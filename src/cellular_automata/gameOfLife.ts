@@ -1,30 +1,22 @@
 import CellularAutomata from "./cellularAutomata.js";
 import Utils from "../utils.js";
 
-export default class GameOfLife extends CellularAutomata {
-    isRunning: boolean = false
-    #simulationInterval?: number
+export default abstract class GameOfLife extends CellularAutomata<boolean> {
+    tiles: boolean[][]
     #simulationStepDelay: number
-    // wasRunning?: boolean
+    #simulationInterval?: number
+    isRunning: boolean = false
 
-    constructor(width: number = 50, height: number = width, simulationStepDelay: number = 100) {
+    protected constructor(width: number, height: number, simulationStepDelay: number) {
         super(width, height)
         this.#simulationStepDelay = simulationStepDelay
-        this.tiles.forEach(row => row.forEach(tile => {
-            tile.isActive = Math.random() > 0.5
-        }))
 
-        let wasRunning: boolean
-        this.board.addEventListener("mousedown", () => {
-            wasRunning = this.isRunning
-            if(wasRunning) {
-                this.stopSimulation()
-            }
-        })
-        this.board.addEventListener("mouseup", () => {
-            if(wasRunning)
-                this.runSimulation()
-        })
+        this.tiles = Array(this.height)
+        for (let y = 0; y < this.height; y++) {
+            this.tiles[y] = Array(this.width)
+            for (let x = 0; x < this.width; x++)
+                this.tiles[y][x] = Math.random() > 0.5
+        }
     }
 
     set simulationStepDelay(value: number) {
@@ -34,6 +26,30 @@ export default class GameOfLife extends CellularAutomata {
         this.stopSimulation()
         this.runSimulation()
     }
+
+    clearGrid() {
+        this.tiles = this.tiles.map(_ => Array(this.width).fill(false))
+    }
+
+    getNeighbours(x: number, y: number, tiles: boolean[][]) {
+        let sum = 0
+        for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+                if (dy === 0 && dx === 0)
+                    continue
+                const wy = Utils.wrapValue(y + dy, 0, this.height)
+                const wx = Utils.wrapValue(x + dx, 0, this.width)
+                sum += tiles[wy][wx] ? 1 : 0
+                // sum += Number(tiles[wy][wx])
+                // sum += tiles[(y + dy + this.height) % this.height][(x + dx + this.width) % this.width] ? 1 : 0
+                // if (tiles[wy][wx])
+                //     sum++
+            }
+        }
+        return sum
+    }
+
+    abstract simulationStep(): void
 
     runSimulation() {
         if (this.isRunning)
@@ -49,28 +65,5 @@ export default class GameOfLife extends CellularAutomata {
             return
         this.isRunning = false
         clearInterval(this.#simulationInterval)
-    }
-
-    getNeighbours(x: number, y: number, tiles: boolean[][]) {
-        let sum = 0
-        for (let dy = -1; dy <= 1; dy++) {
-            for (let dx = -1; dx <= 1; dx++) {
-                if (dy === 0 && dx === 0)
-                    continue
-                const wy = Utils.wrapValue(y + dy, 0, this.height)
-                const wx = Utils.wrapValue(x + dx, 0, this.width)
-                sum += Number(tiles[wy][wx])
-            }
-        }
-        return sum
-    }
-
-    simulationStep() {
-        const oldTiles = this.tiles.map(row => row.map(tile => tile.isActive))
-        oldTiles.forEach((row, y) =>
-            row.forEach((wasAlive, x) => {
-                const n = this.getNeighbours(x, y, oldTiles)
-                this.tiles[y][x].isActive = (n === 2 && wasAlive) || n === 3
-            }))
     }
 }
