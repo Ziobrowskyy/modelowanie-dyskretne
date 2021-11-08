@@ -16,9 +16,8 @@ export type ColorArray = [r: number, g: number, b: number, a: number]
 export class Color {
     static RED: ColorArray = [255, 0, 0, 255]
     static WHITE: ColorArray = [255, 255, 255, 255]
+    static BLACK: ColorArray = [0, 0, 0, 255]
     static PURPLE: ColorArray = [103, 0, 150, 255]
-    // static LIGHT_PURPLE: ColorArray = [205, 94, 255, 255]
-    // static LIGHT_PURPLE: ColorArray = [176, 0, 255, 255]
     static LIGHT_PURPLE: ColorArray = [211, 146, 230, 255]
     static DARK_PURPLE: ColorArray = [166, 27, 133, 255]
 }
