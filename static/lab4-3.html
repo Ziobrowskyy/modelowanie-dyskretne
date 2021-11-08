@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lab 4-3 - MetaBalls</title>
+    <script src="../out/lab4-3.js" type="module"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        canvas {
+            height: 800px;
+            width: 800px;
+            /*image-rendering: -moz-crisp-edges;*/
+            /*image-rendering: -webkit-crisp-edges;*/
+            /*image-rendering: pixelated;*/
+            /*image-rendering: crisp-edges;*/
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+<a href="index.html">Go back</a>
+<br>
+
+<label>Select grid (5-500):
+    <input id="grid-input" type="number" min="5" max="500" value="50">
+</label>
+<button id="apply-grid-button">Apply grid</button>
+<button id="clear-grid-button">Clear grid</button>
+<label>Select simulation delay (>0):
+    <input id="simulation-step-delay-input" type="number" min="1" max="1000" value="100">
+</label>
+<button id="simulation-step-button">Simulation step</button>
+<button id="simulation-run-button">Run simulation</button>
+</body>
+</html>
