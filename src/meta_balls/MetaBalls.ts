@@ -1,5 +1,5 @@
 import Canvas from "../Canvas.js";
-import {ColorArray} from "../utils.js";
+import {Color, ColorArray} from "../utils.js";
 
 class Ball {
     x: number
@@ -19,12 +19,12 @@ class Ball {
         // this.y = (this.y + this.yV + mY) % mY
         this.x += this.xV
         this.y += this.yV
-        if(this.x < 0 || this.x > mX) {
+        if (this.x < 0 || this.x > mX) {
             // this.x = (this.x + mX) % mX
 
             this.xV *= -1
         }
-        if(this.y < 0 || this.y > mY) {
+        if (this.y < 0 || this.y > mY) {
             // this.y = (this.y + mY) % mY
             this.yV *= -1
         }
@@ -35,7 +35,9 @@ export default class MetaBalls extends Canvas {
     balls: Ball[] = []
 
     constructor() {
-        super(400, 400, 400, 400)
+        const s = 400
+        const w = s, h = s
+        super(w, h, w, h)
         this.setupBalls()
         this.simulationStep()
     }
@@ -60,15 +62,13 @@ export default class MetaBalls extends Canvas {
             for (let x = 0; x < this.renderWidth; x++) {
                 let distSum = 0
                 for (let ball of this.balls) {
-                    const dist = 255 / getDist(x, y, ball.x, ball.y)
+                    const dist = 1 / getDist(x, y, ball.x, ball.y)
                     distSum += dist
                 }
-                distSum *= 5
                 // if (distSum > 255)
                 //     distSum = 255
-                if (distSum < 255)
-                    distSum = 0
-                const c: ColorArray = [distSum, distSum, distSum, 255]
+                const c = distSum > 0.20 ? distSum > 0.25 ? distSum > 0.35 ? Color.PURPLE : Color.RED : Color.WHITE : Color.BLACK
+                // const c: ColorArray = [c,c,c, 255]
                 // if(distSum != 0)
                 // console.log(c)
                 this.drawPixel(x, y, c)
