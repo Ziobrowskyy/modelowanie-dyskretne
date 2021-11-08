@@ -10,14 +10,18 @@ export default class Simulation1d extends CellularAutomata<Tile> {
     constructor(rule: number = 60, grid: number = 100) {
         super(grid, grid)
         this.rule = rule
-
         this.tiles = Array(this.height)
         for(let y = 0; y < this.height; y++) {
             this.tiles[y] = Array(this.width)
-            for (let x = 0; x < this.width; x++)
-                this.tiles[y][x] = new Tile()
+            for (let x = 0; x < this.width; x++) {
+                const tile = new Tile()
+                this.tiles[y][x] = tile
+                this.board.append(tile.div)
+            }
         }
-
+        this.tiles[0][Math.floor(this.width/2)].isActive = true
+        this.board.style.gridTemplateColumns = `repeat(${this.width}, 1fr)`
+        this.board.style.gridTemplateRows = `repeat(${this.height}, 1fr)`
         this.runSimulation()
     }
 

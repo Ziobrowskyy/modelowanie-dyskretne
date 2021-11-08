@@ -1,5 +1,3 @@
-import Tile from "./tile.js";
-
 export default abstract class CellularAutomata<T> {
     height: number
     width: number
@@ -12,9 +10,6 @@ export default abstract class CellularAutomata<T> {
         this.height = height
 
         this.board.classList.add("board")
-        // this.board.style.gridTemplateColumns = `repeat(${this.width}, 1fr)`
-        // this.board.style.gridTemplateRows = `repeat(${this.height}, 1fr)`
-
         this.wrapper.classList.add("board-wrapper")
         this.wrapper.append(this.board)
     }
