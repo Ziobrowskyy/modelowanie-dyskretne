@@ -56,19 +56,23 @@ export default class MetaBalls extends Canvas {
 
     simulationStep() {
         const getDist = (x1: number, y1: number, x2: number, y2: number) => {
-            return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
+            // return 1 / Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2))
+            const r = Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)
+            return 1 / r
         }
         for (let y = 0; y < this.renderHeight; y++) {
             for (let x = 0; x < this.renderWidth; x++) {
                 let distSum = 0
                 for (let ball of this.balls) {
-                    const dist = 1 / getDist(x, y, ball.x, ball.y)
+                    const dist = 255 * getDist(x, y, ball.x, ball.y)
                     distSum += dist
                 }
                 // if (distSum > 255)
                 //     distSum = 255
-                const c = distSum > 0.20 ? distSum > 0.25 ? distSum > 0.35 ? Color.PURPLE : Color.RED : Color.WHITE : Color.BLACK
+                // const c = distSum > 0.20 ? distSum > 0.25 ? distSum > 0.35 ? Color.PURPLE : Color.RED : Color.WHITE : Color.BLACK
                 // const c: ColorArray = [c,c,c, 255]
+                // console.log(distSum)
+                const c: ColorArray = [distSum, distSum, distSum, 255]
                 // if(distSum != 0)
                 // console.log(c)
                 this.drawPixel(x, y, c)

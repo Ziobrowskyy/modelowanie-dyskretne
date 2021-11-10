@@ -1,4 +1,4 @@
-import {map} from "./image_transfrom/map.js"
+import {map} from "./map.js"
 import ImageTransform from "./image_transfrom/imageTransform.js";
 import Canvas from "./image_transfrom/canvas.js";
 

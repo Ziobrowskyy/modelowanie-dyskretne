@@ -15,7 +15,7 @@ export default abstract class Canvas {
     isRunning: boolean = false
     simulationDelay: number = 100
 
-    constructor(width: number, height: number, renderWidth: number, renderHeight: number) {
+    protected constructor(width: number, height: number, renderWidth: number, renderHeight: number) {
         this.width = width
         this.height = height
         this.renderWidth = renderWidth

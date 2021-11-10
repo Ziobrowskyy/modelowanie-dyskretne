@@ -40,10 +40,6 @@ export default abstract class GameOfLife extends CellularAutomata<boolean> {
                 const wy = Utils.wrapValue(y + dy, 0, this.height)
                 const wx = Utils.wrapValue(x + dx, 0, this.width)
                 sum += tiles[wy][wx] ? 1 : 0
-                // sum += Number(tiles[wy][wx])
-                // sum += tiles[(y + dy + this.height) % this.height][(x + dx + this.width) % this.width] ? 1 : 0
-                // if (tiles[wy][wx])
-                //     sum++
             }
         }
         return sum

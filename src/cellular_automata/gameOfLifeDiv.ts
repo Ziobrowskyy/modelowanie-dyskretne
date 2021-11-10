@@ -7,7 +7,6 @@ export default class GameOfLifeDiv extends GameOfLife {
     constructor(width: number, height: number, simulationStepDelay: number) {
         super(width, height, simulationStepDelay)
 
-        // grid-template-columns: repeat(50, 1fr); grid-template-rows: repeat(50, 1fr);
         this.board.style.gridTemplateColumns = `repeat(${this.width}, 1fr)`
         this.board.style.gridTemplateRows = `repeat(${this.height}, 1fr)`
 
@@ -31,7 +30,6 @@ export default class GameOfLifeDiv extends GameOfLife {
     }
 
     simulationStep() {
-        const t1 = Date.now()
         const oldTiles = this.tiles.map(row => [...row])
 
         this.tiles = oldTiles.map((row, y) =>
@@ -41,7 +39,6 @@ export default class GameOfLifeDiv extends GameOfLife {
                 this.tileDivs[y][x].isActive = isAlive
                 return isAlive
             }))
-        console.log(`time =  ${Date.now() - t1} ms`)
     }
 
     clearGrid(): void {
