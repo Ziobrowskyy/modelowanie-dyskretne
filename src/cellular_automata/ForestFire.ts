@@ -1,41 +1,64 @@
 import Canvas from "../Canvas.js";
 import Utils, {Color} from "../utils.js";
-import {map} from "../map.js"
+import ImageTransform from "../image_transfrom/imageTransform.js";
 
 enum CellState {
     DEAD,
     LIVE,
     BURN,
-    NONE
+    WATER
 }
+
+const img = new Image()
+img.src = "map.bmp"
+await img.decode()
 
 export default class ForestFire extends Canvas {
     cells: CellState[][]
 
-    igniteChance: number = 0.05
-    growChange: number = 0.01
+    igniteChance: number = 0.00001
+    growChange: number = 0.001
 
-    constructor(width: number, height: number) {
-        super(map[0].length, map.length, map[0].length, map.length)
-        this.cells = Array(map.length)
-        for (let y = 0; y < this.renderHeight; y++) {
-            this.cells[y] = Array(map[0].length)
-            for (let x = 0; x < this.renderWidth; x++) {
-                this.cells[y][x] = this.getCellState()
-            }
-        }
-        // const size = 800
-        // super(size, size, width, height);
-
-        // this.cells = Array(this.renderHeight)
+    constructor() {
+        super(img.width, img.height, img.width, img.height)
+        // this.cells = Array(map.length)
         // for (let y = 0; y < this.renderHeight; y++) {
-        //     this.cells[y] = Array(this.renderWidth)
+        //     this.cells[y] = Array(map[0].length)
         //     for (let x = 0; x < this.renderWidth; x++) {
         //         this.cells[y][x] = this.getCellState()
         //     }
         // }
-        this.drawCells()
-        console.log(this.cells)
+        this.simulationDelay = 16
+
+        this.cells = Array(this.height)
+        for(let y = 0; y < this.height; y++)
+            this.cells[y] = Array(this.width)
+
+        this.getPixelsFromImage().then(() => {
+            this.drawCells()
+        })
+    }
+
+    async getPixelsFromImage() {
+        const img = new Image()
+        img.src = "map.bmp"
+        await img.decode()
+        this.context.drawImage(img, 0, 0)
+        const imgData = this.context.getImageData(0, 0, this.renderWidth, this.renderHeight).data
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+                const pixelValue = imgData[(y * this.width + x) * 4]
+                let cellState
+                if (pixelValue === 55)
+                    cellState = CellState.WATER
+                else if (ImageTransform.binarize(pixelValue, 220) === 255 && Math.random() < 0.3)
+                    cellState = CellState.LIVE
+                else
+                    cellState = CellState.DEAD
+                // this.cells[y][x] = ImageTransform.binarize(imgData[(y * this.width + x) * 4], 60)
+                this.cells[y][x] = cellState
+            }
+        }
     }
 
     getCellState() {
@@ -70,20 +93,20 @@ export default class ForestFire extends Canvas {
         this.cells = this.cells.map((row, y) =>
             row.map((cellState, x) => {
                 // lake tiles pog
-                if(cellState === CellState.NONE)
-                    return CellState.NONE
+                if (cellState === CellState.WATER)
+                    return CellState.WATER
                 if (cellState === CellState.BURN)
                     return CellState.DEAD
                 const burnCount = this.getBurningNeighbours(x, y, oldCells)
                 // const [dead, live, burnCount] = this.getBurningNeighbours(x, y, oldCells)
                 if (cellState === CellState.LIVE) {
-                    if (burnCount > 0 || Math.random() < 0.0005)
+                    if (burnCount > 0 || Math.random() < this.igniteChance)
                         return CellState.BURN
                     else
                         return CellState.LIVE
                 }
                 if (cellState === CellState.DEAD) {
-                    if (Math.random() < 0.05)
+                    if (Math.random() < this.growChange)
                         return CellState.LIVE
                     else
                         return CellState.DEAD
@@ -121,7 +144,7 @@ export default class ForestFire extends Canvas {
                 //     color = Color.GREEN
                 // if(cellState === CellState.BURN)
                 //     color = Color.RED
-                const color = cellState === CellState.DEAD ? Color.BLACK : cellState === CellState.LIVE ? Color.GREEN : Color.RED
+                const color = cellState === CellState.WATER ? Color.BLUE : cellState === CellState.DEAD ? Color.BLACK : cellState === CellState.LIVE ? Color.GREEN : Color.RED
                 this.drawPixel(x, y, color)
             })
         })

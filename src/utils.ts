@@ -17,8 +17,11 @@ export class Color {
     static RED: ColorArray = [255, 0, 0, 255]
     static WHITE: ColorArray = [255, 255, 255, 255]
     static BLACK: ColorArray = [0, 0, 0, 255]
+    static GRAY: ColorArray = [120, 120, 120, 255]
+    static DARK_GRAY: ColorArray = [55, 55, 55, 255]
     static PURPLE: ColorArray = [103, 0, 150, 255]
     static GREEN: ColorArray = [0, 255, 0, 255]
+    static BLUE: ColorArray = [66, 135, 245, 255]
     static LIGHT_PURPLE: ColorArray = [211, 146, 230, 255]
     static DARK_PURPLE: ColorArray = [166, 27, 133, 255]
 }

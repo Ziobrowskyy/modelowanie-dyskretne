@@ -13,7 +13,7 @@ export default abstract class Canvas {
 
     simulationInterval?: number
     isRunning: boolean = false
-    simulationDelay: number = 100
+    #simulationDelay: number = 100
 
     protected constructor(width: number, height: number, renderWidth: number, renderHeight: number) {
         this.width = width
@@ -33,6 +33,14 @@ export default abstract class Canvas {
         this.canvasImageData = this.context.getImageData(0, 0, this.renderWidth, this.renderHeight)
 
         this.wrapper.append(this.canvas)
+    }
+
+    set simulationDelay(value: number) {
+        this.#simulationDelay = value
+        if (!this.isRunning)
+            return
+        this.stopSimulation()
+        this.runSimulation()
     }
 
     drawPixel(x: number, y: number, color: ColorArray) {
