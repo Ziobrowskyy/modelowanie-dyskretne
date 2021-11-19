@@ -7,8 +7,6 @@ enum CellState {
     DEAD,
     LIVE,
     BURN,
-    BURNT,
-    BURNT_MAX = 14
 }
 
 export default class ForestFire extends Canvas {
@@ -113,9 +111,7 @@ export default class ForestFire extends Canvas {
                     case CellState.WATER:
                         return CellState.WATER
                     case CellState.BURN:
-                        return CellState.BURNT
-                    // case CellState.BURNT:
-                    //     return CellState.DEAD
+                        return CellState.DEAD
                     case CellState.LIVE:
                         let burnCount = 0
                         Utils.forEachNeighbour(this.cells, x, y, (state, nx, ny) => {
@@ -125,21 +121,11 @@ export default class ForestFire extends Canvas {
                         const burnProp = burnCount * 4 * cellIgnitePenalty
                         if (Math.random() < burnProp || Math.random() < this.igniteChance * cellIgnitePenalty)
                             return CellState.BURN
-                        else
-                            return CellState.LIVE
-                    case CellState.BURNT:
+                        return cellState
                     case CellState.DEAD:
                         if (Math.random() < this.growChange * (1 + this.humidity))
                             return CellState.LIVE
-                        if (cellState === CellState.DEAD)
-                            return CellState.DEAD
-                        return cellState + 1
-                    default:
-                        if (Math.random() < this.growChange * (1 + this.humidity))
-                            return CellState.LIVE
-                        if (cellState === CellState.BURNT_MAX)
-                            return CellState.DEAD
-                        return cellState + 1
+                        return cellState
                 }
             })
         )
@@ -165,15 +151,6 @@ export default class ForestFire extends Canvas {
                     case CellState.BURN:
                         color = Color.RED
                         break
-                    case CellState.BURNT:
-                        color = Color.BROWN
-                        break
-                    default: // state between BURNT and MAX_BURNT
-                        // const burntFactor = (CellState.MAX_BURNT - cellState) / CellState.MAX_BURNT
-                        color = Color.BROWN
-                    // color[0] *= burntFactor
-                    // color[1] *= burntFactor
-                    // color[2] *= burntFactor
                 }
                 this.drawPixel(x, y, color)
                 // log initial cell state, terrain and humidity with colors
