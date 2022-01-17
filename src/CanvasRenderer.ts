@@ -1,6 +1,6 @@
 import {ColorArray} from "./utils.js";
 
-export default abstract class Canvas {
+export default abstract class CanvasRenderer {
     width: number
     height: number
     renderWidth: number

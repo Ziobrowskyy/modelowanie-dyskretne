@@ -1,5 +1,5 @@
 import Canvas from "../Canvas.js";
-import Utils, {Color, ColorArray, Vector2} from "../utils.js";
+import Utils, {Color, ColorArray, Vec2} from "../utils.js";
 import ImageTransform from "../image_transfrom/imageTransform.js";
 
 enum CellState {
@@ -14,12 +14,12 @@ export default class ForestFire extends Canvas {
     cellsTerrain: number[][]
     cellsHumidity: number[][]
 
-    igniteChance: number = 0.0001
+    igniteChance: number = 0.00001
     growChange: number = 0.001
     humidity: number = 0.5
 
     img: HTMLImageElement
-    #windDirection: Vector2 = new Vector2()
+    #windDirection: Vec2 = new Vec2()
     wind: number[][]
 
     constructor(img: HTMLImageElement) {
@@ -40,7 +40,7 @@ export default class ForestFire extends Canvas {
         for (let y = -1; y <= 1; y++)
             this.wind[y] = Array(3)
 
-        this.windDirection = new Vector2(1, 0)
+        this.windDirection = new Vec2(1, 0)
 
         console.table(this.wind)
 
@@ -49,12 +49,12 @@ export default class ForestFire extends Canvas {
         this.drawCells()
     }
 
-    set windDirection(value: Vector2) {
+    set windDirection(value: Vec2) {
         this.#windDirection = value
         for (let y = -1; y <= 1; y++) {
             for (let x = -1; x <= 1; x++) {
-                let v1 = new Vector2(x, y).norm()
-                let x1 = v1.sub(this.#windDirection).length()
+                let v1 = new Vec2(x, y).norm()
+                let x1 = v1.subVec(this.#windDirection).length()
                 x1 = x1 > 1 ? x1 / 4 : 0
                 this.wind[y][x] = x1
             }
@@ -69,10 +69,12 @@ export default class ForestFire extends Canvas {
             this.cellsHumidity = this.cellsHumidity.map((row, y) =>
                 row.map((cell, x) => {
                     let max = this.cellsHumidity[y][x]
+                    if (max === 1.0)
+                        return max
                     Utils.forEachNeighbour(this.cellsHumidity, x, y, (value) => {
-                        max = Math.max(max, value * 0.90)
+                        max = Math.max(max, value * 0.95)
                     })
-                    return max
+                    return max > 0.8 ? 0.8 : max
                 })
             )
         }
@@ -118,7 +120,7 @@ export default class ForestFire extends Canvas {
                             burnCount += state === CellState.BURN ? this.wind[ny][nx] : 0
                         })
                         const cellIgnitePenalty = (1 - this.cellsHumidity[y][x]) * (1 - this.cellsTerrain[y][x])
-                        const burnProp = burnCount * 4 * cellIgnitePenalty
+                        const burnProp = burnCount * (1-this.cellsHumidity[y][x])//* cellIgnitePenalty
                         if (Math.random() < burnProp || Math.random() < this.igniteChance * cellIgnitePenalty)
                             return CellState.BURN
                         return cellState
@@ -157,6 +159,7 @@ export default class ForestFire extends Canvas {
                 // const h = this.cellsHumidity[y][x]
                 // const t = this.cellsTerrain[y][x]
                 // const s = cellState === CellState.LIVE ? 255 : 0
+                // this.drawPixel(x, y, [0, 0, h * 255, 255])
                 // this.drawPixel(x, y, [s, t * 255, h * 255, 255])
             })
         })

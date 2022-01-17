@@ -40,7 +40,7 @@ export class Color {
     static DARK_PURPLE: ColorArray = [166, 27, 133, 255]
 }
 
-export class Vector2 {
+export class Vec2 {
     x: number
     y: number
 
@@ -49,23 +49,47 @@ export class Vector2 {
         this.y = y
     }
 
-    copy(): Vector2 {
-        return new Vector2(this.x, this.y)
+    copy(): Vec2 {
+        return new Vec2(this.x, this.y)
     }
 
-    filter(f: (v: Vector2) => boolean): Vector2 {
-        return f(this) ? this.copy() : new Vector2
+    filter(f: (v: Vec2) => boolean): Vec2 {
+        return f(this) ? this.copy() : new Vec2
     }
 
-    add(other: Vector2): Vector2 {
-        return new Vector2(this.x + other.x, this.y + other.y)
+    pow(v: number): Vec2 {
+        return new Vec2(Math.pow(this.x, v), Math.pow(this.y, v))
     }
 
-    sub(other: Vector2): Vector2 {
-        return new Vector2(this.x - other.x, this.y - other.y)
+    mult(v: number): Vec2 {
+        return new Vec2(this.x * v, this.y * v)
     }
 
-    dist(other: Vector2): number {
+    multVec(other: Vec2): Vec2 {
+        return new Vec2(this.x * other.x, this.y * other.y)
+    }
+
+    div(v: number): Vec2 {
+        return new Vec2(this.x / v, this.y / v)
+    }
+
+    addVec(other: Vec2): Vec2 {
+        return new Vec2(this.x + other.x, this.y + other.y)
+    }
+
+    add(x: number, y: number): Vec2 {
+        return new Vec2(this.x + x, this.y + y)
+    }
+
+    subVec(other: Vec2): Vec2 {
+        return new Vec2(this.x - other.x, this.y - other.y)
+    }
+
+    sub(x: number, y: number): Vec2 {
+        return new Vec2(this.x - x, this.y - y)
+    }
+
+    dist(other: Vec2): number {
         return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2))
     }
 
@@ -73,10 +97,20 @@ export class Vector2 {
         return Math.sqrt(Math.pow(this.x * this.x, 2) + Math.pow(this.y * this.y, 2))
     }
 
-    norm(): Vector2 {
+    toNumber(): number {
+        return this.x + this.y
+    }
+
+    norm(): Vec2 {
         const len = this.length()
         if (len > 0)
-            return new Vector2(this.x / len, this.y / len)
+            return new Vec2(this.x / len, this.y / len)
         else return this.copy()
+    }
+
+    wrap(xMin: number, xMax: number, yMin: number, yMax: number): Vec2 {
+        const wX = Utils.wrapValue(this.x, xMin, xMax)
+        const wY = Utils.wrapValue(this.y, yMin, yMax)
+        return new Vec2(wX, wY)
     }
 }

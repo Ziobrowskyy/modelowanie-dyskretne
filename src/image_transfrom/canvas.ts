@@ -1,4 +1,4 @@
-import {ColorArray} from "../utils";
+import {ColorArray} from "../utils.js";
 
 export default class Canavs {
     wrapper: HTMLDivElement

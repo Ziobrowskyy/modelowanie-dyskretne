@@ -1,18 +1,18 @@
 import ForestFire from "./cellular_automata/ForestFire.js";
 import Canvas from "./Canvas.js";
-import {Vector2} from "./utils.js";
+import {Vec2} from "./utils.js";
 
 let forestFire: ForestFire
 let windCanvas: Canvas
 
 class WindCanvas extends Canvas {
-    wind: Vector2
-    center: Vector2
+    wind: Vec2
+    center: Vec2
 
     constructor() {
         super(100, 100, 100, 100)
-        this.wind = new Vector2(1, 0).norm()
-        this.center = new Vector2(this.width / 2, this.height / 2)
+        this.wind = new Vec2(1, 0).norm()
+        this.center = new Vec2(this.width / 2, this.height / 2)
         console.log(this.wind)
         this.context.beginPath()
         this.context.moveTo(this.center.x, this.center.y)
