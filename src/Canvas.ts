@@ -48,6 +48,7 @@ export default abstract class Canvas {
     }
 
     updatePixels() {
+        this.context.clearRect(0, 0, this.width, this.height)
         this.context.putImageData(this.canvasImageData, 0, 0)
     }
 

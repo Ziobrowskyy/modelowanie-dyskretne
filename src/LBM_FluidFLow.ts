@@ -1,5 +1,5 @@
 import Canvas from "./Canvas.js";
-import {Color, ColorArray, Vec2} from "./utils.js";
+import {ColorArray} from "./utils.js";
 
 enum Direction {
     C,
@@ -37,14 +37,17 @@ export class LBM_FluidFlow extends Canvas {
     cells: Cell[][]
 
     constructor() {
-        const w = 100
-        const h = 100
+        const w = 128 * 3
+        const h = 128 * 3
         super(w, h, w * 4, h * 4);
         this.cells = Array(this.height)
 
         this.#setupCells()
         this.#drawCells()
         this.simulationDelay = 1
+
+        this.context.scale(1,-1)
+        this.context.translate(0,-this.height)
     }
 
     #setupCells() {
@@ -91,6 +94,7 @@ export class LBM_FluidFlow extends Canvas {
         this.#collision()
         this.#streaming()
         this.#drawCells()
+        this.#drawLines()
     }
 
     #streaming() {
@@ -176,7 +180,6 @@ export class LBM_FluidFlow extends Canvas {
     #drawCells() {
         // this.clearWithColor()
         let s = 0
-        let toPrint = 0
         this.cells.forEach((row, y) => {
             row.forEach((cell, x) => {
                 let color: ColorArray = [255, 255, 255, 255]
@@ -195,6 +198,60 @@ export class LBM_FluidFlow extends Canvas {
         })
         console.log(s)
         this.updatePixels()
+    }
+
+    #drawLines() {
+        this.context.lineWidth = 0
+        this.context.strokeStyle = "black"
+        const arrowLength = 300.0
+        for (let x = 0; x < this.width; x += 10) {
+            for (let y = 0; y < this.height; y += 10) {
+                const cell = this.cells[y][x]
+                this.context.beginPath()
+                this.context.moveTo(x, y);
+                this.context.lineTo(x + cell.vx * arrowLength, y + cell.vy * arrowLength);
+                this.context.stroke();
+            }
+        }
+
+        this.#drawParticle(0.9, 0.005, "blue")
+        this.#drawParticle(0.4, 0.002, "yellow")
+        this.#drawParticle(0.0, 0.000, "green")
+    }
+
+    #drawParticle(mu: number, grav: number, color: string = "black") {
+        this.context.lineWidth = 1
+        this.context.strokeStyle = color
+        let xpart0, xpart1, ypart0, ypart1;
+        let vxpart0, vxpart1, vypart0, vypart1;
+        const epsilon = 1e-4
+        for (let iterp = 1; iterp <= 5; iterp++) {
+            xpart0 = xpart1 = 0.0
+            ypart0 = ypart1 = iterp * this.width / 5 - 1.0;
+            vxpart0 = this.cells[Math.floor(ypart0)][Math.floor(xpart0)].vx
+            vypart0 = this.cells[Math.floor(ypart0)][Math.floor(xpart0)].vy;
+
+            this.context.beginPath()
+            this.context.moveTo(xpart0, ypart0)
+
+            while (xpart1 < this.width - 1 && ypart1 > 0.0 && ypart1 <= this.height - 1 && xpart1 >= 0.0) {
+                vxpart1 = mu * vxpart0 + (1.0 - mu) * this.cells[Math.floor(ypart0)][Math.floor(xpart0)].vx;
+                vypart1 = mu * vypart0 + (1.0 - mu) * this.cells[Math.floor(ypart0)][Math.floor(xpart0)].vy - grav;
+                xpart1 = xpart0 + 100. * (vxpart0 + vxpart1) / 2.0;
+                ypart1 = ypart0 + 100. * (vypart0 + vypart1) / 2.0;
+                vxpart0 = vxpart1;
+                vypart0 = vypart1;
+                this.context.lineTo(xpart1, ypart1)
+
+                if (Math.abs(xpart1 - xpart0) <= epsilon && Math.abs(ypart1 - ypart0) < epsilon) {
+                    break
+                }
+
+                xpart0 = xpart1;
+                ypart0 = ypart1;
+            }
+            this.context.stroke()
+        }
     }
 
 }
