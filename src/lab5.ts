@@ -1,30 +1,5 @@
 import ForestFire from "./cellular_automata/ForestFire.js";
-import Canvas from "./Canvas.js";
-import {Vec2} from "./utils.js";
 
-let forestFire: ForestFire
-let windCanvas: Canvas
-
-class WindCanvas extends Canvas {
-    wind: Vec2
-    center: Vec2
-
-    constructor() {
-        super(100, 100, 100, 100)
-        this.wind = new Vec2(1, 0).norm()
-        this.center = new Vec2(this.width / 2, this.height / 2)
-        console.log(this.wind)
-        this.context.beginPath()
-        this.context.moveTo(this.center.x, this.center.y)
-        this.context.lineTo(this.center.x + this.center.x * this.wind.x, this.center.y + this.center.y * this.wind.y)
-        this.context.closePath()
-        this.context.stroke()
-        this.runSimulation()
-    }
-
-    simulationStep(): void {
-    }
-}
 
 document.addEventListener("DOMContentLoaded", async () => {
     const simulationStepDelayInput = document.body.querySelector("#simulation-step-delay-input") as HTMLInputElement
@@ -38,11 +13,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     img.src = "map.bmp"
     await img.decode()
 
-    forestFire = new ForestFire(img)
+    const forestFire = new ForestFire(img)
     document.body.append(forestFire.wrapper)
-
-    windCanvas = new WindCanvas()
-    document.body.append(windCanvas.wrapper)
 
     const setSimulation = (value: boolean) => {
         if (value)

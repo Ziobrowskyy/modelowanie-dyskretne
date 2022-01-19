@@ -100,7 +100,7 @@ export class Vec2 {
     }
 
     length(): number {
-        return Math.sqrt(Math.pow(this.x * this.x, 2) + Math.pow(this.y * this.y, 2))
+        return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2))
     }
 
     toNumber(): number {

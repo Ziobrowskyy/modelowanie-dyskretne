@@ -1,6 +1,5 @@
 import Canvas from "../Canvas.js";
 import Utils, {Color, ColorArray, Vec2} from "../utils.js";
-import ImageTransform from "../image_transfrom/imageTransform.js";
 
 enum CellState {
     WATER,
@@ -19,6 +18,8 @@ export default class ForestFire extends Canvas {
     humidity: number = 0.5
 
     img: HTMLImageElement
+    windAngle: number
+    newAngle: number = 0
     #windDirection: Vec2 = new Vec2()
     wind: number[][]
 
@@ -40,9 +41,17 @@ export default class ForestFire extends Canvas {
         for (let y = -1; y <= 1; y++)
             this.wind[y] = Array(3)
 
-        this.windDirection = new Vec2(1, 0)
+        this.windAngle = Math.random() * Math.PI * 2
+        // this.windDirection = new Vec2(1,0)
+        this.windDirection = new Vec2(Math.cos(this.windAngle), Math.sin(this.windAngle))
 
-        console.table(this.wind)
+        console.log(this.#windDirection)
+        for (let y = -1; y <= 1; y++) {
+            let a = ""
+            for (let x = -1; x <= 1; x++)
+                a += this.wind[y][x].toPrecision(3) + "\t"
+            console.log(a)
+        }
 
         this.getPixelsFromImage()
         this.#setPixelsHumidity()
@@ -50,7 +59,7 @@ export default class ForestFire extends Canvas {
     }
 
     set windDirection(value: Vec2) {
-        this.#windDirection = value
+        this.#windDirection = value.norm()
         for (let y = -1; y <= 1; y++) {
             for (let x = -1; x <= 1; x++) {
                 let v1 = new Vec2(x, y).norm()
@@ -60,7 +69,6 @@ export default class ForestFire extends Canvas {
             }
         }
     }
-
 
     #setPixelsHumidity() {
         const humidityPasses = 20
@@ -94,18 +102,24 @@ export default class ForestFire extends Canvas {
                     this.cellsHumidity[y][x] = 0
                     this.cellsTerrain[y][x] = pixelValue / 255
                     if (Math.random() < this.cellsTerrain[y][x])
-                        // if (ImageTransform.binarize(pixelValue, 220) == 255 && Math.random() < 0.3)
                         this.cells[y][x] = CellState.LIVE
                     else
                         this.cells[y][x] = CellState.DEAD
                 }
-                // this.cells[y][x] = ImageTransform.binarize(imgData[(y * this.width + x) * 4], 60)
-                // this.cells[y][x] = cellState
             }
         }
     }
 
     simulationStep(): void {
+        // update wind
+        if (Math.random() < 0.01) {
+            this.newAngle = Math.random() * Math.PI * 2
+            console.log("new wind angle: " + this.newAngle)
+        }
+        this.windAngle += (this.windAngle - this.newAngle) * 0.1
+        this.windDirection = new Vec2(Math.cos(this.windAngle), Math.sin(this.windAngle))
+
+        // update cell state
         this.cells = this.cells.map((row, y) =>
             row.map((cellState, x) => {
                 // lake tiles pog
@@ -120,7 +134,7 @@ export default class ForestFire extends Canvas {
                             burnCount += state === CellState.BURN ? this.wind[ny][nx] : 0
                         })
                         const cellIgnitePenalty = (1 - this.cellsHumidity[y][x]) * (1 - this.cellsTerrain[y][x])
-                        const burnProp = burnCount * (1-this.cellsHumidity[y][x])//* cellIgnitePenalty
+                        const burnProp = burnCount * (1 - this.cellsHumidity[y][x])//* cellIgnitePenalty
                         if (Math.random() < burnProp || Math.random() < this.igniteChance * cellIgnitePenalty)
                             return CellState.BURN
                         return cellState
@@ -138,7 +152,6 @@ export default class ForestFire extends Canvas {
         this.cells.forEach((row, y) => {
             row.forEach((cellState, x) => {
                 // is this faster???
-                // const color = cellState === CellState.WATER ? Color.BLUE : cellState === CellState.DEAD ? Color.BLACK : cellState === CellState.LIVE ? Color.GREEN : Color.RED
                 let color: ColorArray
                 switch (cellState) {
                     case CellState.WATER:
@@ -160,6 +173,7 @@ export default class ForestFire extends Canvas {
                 // const t = this.cellsTerrain[y][x]
                 // const s = cellState === CellState.LIVE ? 255 : 0
                 // this.drawPixel(x, y, [0, 0, h * 255, 255])
+                // this.drawPixel(x, y, [0, t * 255, 0, 255])
                 // this.drawPixel(x, y, [s, t * 255, h * 255, 255])
             })
         })
