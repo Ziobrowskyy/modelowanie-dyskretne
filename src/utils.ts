@@ -10,7 +10,13 @@ export default class Utils {
     static wrapValue(v: number, min: number, max: number) {
         return (v + max) % max
     }
-
+    static zip (...arrays: any[][]) {
+        const minLen = Math.min(...arrays.map(arr => arr.length))
+        const [first, ...rest] = arrays
+        return first.slice(0, minLen).map(
+            (val, i) => [val, ...rest.map( arr => arr[i]) ]
+        )
+    }
     static forEachNeighbour<T>(array: T[][], x: number, y: number, f: (value: T, nx: number, ny: number) => void) {
         for (let dy = -1; dy <= 1; dy++) {
             for (let dx = -1; dx <= 1; dx++) {
